@@ -5,8 +5,9 @@ import (
 	_ "github.com/mitchellh/mapstructure"
 	"github.com/spf13/viper"
 	"os"
+	"rankwillFetch/app"
 	"rankwillFetch/common"
-	"rankwillFetch/fetching"
+	"sync"
 )
 
 func init() {
@@ -15,25 +16,26 @@ func init() {
 	_ = common.InitDB()
 }
 func main() {
-	//wg := sync.WaitGroup{}
-	//wg.Add(1)
-	//go func() {
-	//	app.AppRun()
-	//}()
-	//wg.Wait()
-
-	fetching.ChannelStart("biweekly-contest-99", false)
-	fetching.ChannelStart("weekly-contest-335", false)
-	fetching.ChannelStart("biweekly-contest-98", false)
-	fetching.ChannelStart("weekly-contest-334", false)
-	fetching.ChannelStart("biweekly-contest-97", false)
-	fetching.ChannelStart("weekly-contest-333", false)
-	fetching.ChannelStart("biweekly-contest-96", false)
-	fetching.ChannelStart("weekly-contest-332", false)
-	fetching.ChannelStart("biweekly-contest-95", false)
-	fetching.ChannelStart("weekly-contest-331", false)
-	fetching.ChannelStart("biweekly-contest-94", false)
-	fetching.ChannelStart("weekly-contest-330", false)
+	wg := sync.WaitGroup{}
+	wg.Add(1)
+	go func() {
+		app.AppRun()
+	}()
+	wg.Wait()
+	//fetching.ChannelStart("biweekly-contest-98", true)
+	//fetching.ChannelStart("biweekly-contest-98", false)
+	//fetching.ChannelStart("biweekly-contest-99", false)
+	//fetching.ChannelStart("weekly-contest-335", false)
+	//fetching.ChannelStart("biweekly-contest-98", false)
+	//fetching.ChannelStart("weekly-contest-334", false)
+	//fetching.ChannelStart("biweekly-contest-97", false)
+	//fetching.ChannelStart("weekly-contest-333", false)
+	//fetching.ChannelStart("biweekly-contest-96", false)
+	//fetching.ChannelStart("weekly-contest-332", false)
+	//fetching.ChannelStart("biweekly-contest-95", false)
+	//fetching.ChannelStart("weekly-contest-331", false)
+	//fetching.ChannelStart("biweekly-contest-94", false)
+	//fetching.ChannelStart("weekly-contest-330", false)
 
 }
 func InitConfig() {

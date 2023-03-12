@@ -14,8 +14,7 @@ func AppRun() {
 	s.Every(1).Week().Saturday().At("23:30:30").Do(BiweekPrepare)
 	s.Every(1).Week().Sunday().At("00:10:30").Do(BiweekRun)
 	s.Every(1).Week().Sunday().At("10:30:30").Do(WeeklyPrepare)
-	s.Every(1).Week().Sunday().At("12:13:30").Do(WeeklyRun)
-
+	s.Every(1).Week().Sunday().At("12:10:30").Do(WeeklyRun)
 	s.StartAsync()
 }
 

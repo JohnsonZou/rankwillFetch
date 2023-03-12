@@ -21,10 +21,10 @@ import (
 const (
 	fetchTime      = 6
 	waitTime       = 0
-	numOfThread    = 5
+	numOfThread    = 10
 	stuckTimeK     = 5
 	testPage       = 1
-	testPageNum    = 5
+	testPageNum    = 10
 	UserAgent      = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/110.0.0.0 Safari/537.36 Edg/110.0.1587.50"
 	requestTest    = "https://leetcode.com/contest/api/ranking/weekly-contest-318/?pagination=1&region=global"
 	requestRank    = "https://leetcode.cn/contest/api/ranking/"
@@ -82,6 +82,7 @@ func ChannelStart(contestName string, isPreparation bool) {
 		if testPage == 1 {
 			pageNum = testPageNum
 		}
+		pageNum = int(math.Max(float64(pageNum), float64(numOfThread)))
 		pagesPerThread := (pageNum / numOfThread)
 		ch := make(chan bool)
 		for i := 1; i <= pageNum; i += pagesPerThread {
@@ -96,6 +97,7 @@ func ChannelStart(contestName string, isPreparation bool) {
 	if testPage == 1 {
 		pageNum = testPageNum
 	}
+	pageNum = int(math.Max(float64(pageNum), float64(numOfThread)))
 	pagesPerThread := (pageNum / numOfThread)
 	ch := make(chan bool)
 	for i := 1; i <= pageNum; i += pagesPerThread {
@@ -111,8 +113,8 @@ func ChannelStart(contestName string, isPreparation bool) {
 		return
 	}
 	Predict()
-	InsertIntoRedis()
 	InsertIntoDB()
+	InsertIntoRedis()
 	contestant = make(map[string]model.Contestant)
 }
 func Predict() {
@@ -214,7 +216,7 @@ func TestRedis() {
 func isContestExisted(contestname string) bool {
 	db := common.GetDB()
 	var a model.Contest
-	db.Where("contestname=?", contestname).First(&a)
+	db.Where("title_slug=?", contestname).First(&a)
 	return a.ID != 0
 }
 func InsertIntoDB() {
@@ -225,22 +227,22 @@ func InsertIntoDB() {
 		contestName = v.Contestname
 		break
 	}
-	a := model.Contest{
-		StartTime:     time.Now().Unix(),
-		TitleSlug:     contestName,
-		ContestantNum: len(contestant),
-	}
-	if isContestExisted(contestName) {
-		db.Where("contestname=?", contestName).Updates(&a)
-	} else {
-		db.Create(&a)
-	}
 	for _, v := range contestant {
 		if !isContestantExisted(db, v) {
 			db.Create(&v)
 		} else {
 			db.Where("contestname=?", contestName).Where("username=?", v.Username).Updates(&v)
 		}
+	}
+	a := model.Contest{
+		StartTime:     time.Now().Unix(),
+		TitleSlug:     contestName,
+		ContestantNum: len(contestant),
+	}
+	if isContestExisted(contestName) {
+		db.Where("title_slug=?", contestName).Updates(&a)
+	} else {
+		db.Create(&a)
 	}
 }
 func getrand() float64 {
